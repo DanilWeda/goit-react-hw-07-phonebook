@@ -1,30 +1,29 @@
-import React, { Component } from 'react'
 import classes from './Filter.module.scss'
 import { PropTypes } from 'prop-types'
 
-class Filter extends Component {
+const Filter = ({ filter, onFilter }) => {
 
-  static propTypes = {
-    filter: PropTypes.string.isRequired,
-    onFilter: PropTypes.func.isRequired,
+
+
+  const handleFilterChange = (e) => {
+    onFilter(e.target.value)
   }
 
-  handleFilterChange = (e) => {
-    this.props.onFilter(e.target.value)
-  }
-
-  render() {
     return (
       <div className={classes.stats}>
         <input
-          onInput={this.handleFilterChange}
+          onInput={handleFilterChange}
           type="text"
           name="filter"
-          value={this.props.filter}
+          value={filter}
         />
       </div>
     )
-  }
+}
+
+Filter.propTypes = {
+  filter: PropTypes.string.isRequired,
+  onFilter: PropTypes.func.isRequired,
 }
 
 

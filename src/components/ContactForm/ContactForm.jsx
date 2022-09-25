@@ -1,94 +1,83 @@
-import React, { Component } from 'react'
+import { useState } from 'react'
 import classes from './ContactForm.module.scss'
 import { PropTypes } from 'prop-types'
 import { v4 as uid4 } from 'uuid';
 
-class ContactForm extends Component {
+const ContactForm = ({ onCreate }) => {
+  const [name, setName] = useState('')
+  const [nameError, setNameError] = useState('')
+  const [number, setNumber] = useState('')
+  const [numberError, setNumberError] = useState('')
 
-  constructor() {
-    super();
-
-    this.state = {
-      name: '',
-      nameError: '',
-      number: '',
-      numberError: '',
-    };
+  const handleNameChange = (e) => {
+    setNameError('')
+    setName(e.target.value)
   }
 
-  handleNameChange = (e) => {
-    this.setState({ nameError: '' })
-    this.setState({ name: e.target.value })
+  const handleNumberChange = (e) => {
+    setNumberError('')
+    setNumber(e.target.value.replace(/^[a-zA-Zа-яА-Я]+((['/ -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$/, ''))
   }
 
-  handleNumberChange = (e) => {
-    this.setState({ numberError: '' })
-    this.setState({
-      number: e.target.value.replace(/^[a-zA-Zа-яА-Я]+((['/ -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$/, '')
-    })
-  }
-
-  handleClick = (e) => {
+  const handleClick = (e) => {
     const validName = new RegExp(
       '^[a-zA-Zа-яА-Я]+(([\' -][a-zA-Zа-яА-Я])?[a-zA-Zа-яА-Я]*)*$'
     );
 
-    if (!this.state.name || !this.state.number) {
-      if (!this.state.name) this.setState({ nameError: 'Please type name' })
-      if (!this.state.number) this.setState({ numberError: 'Please type number' })
+    if (!name || !number) {
+      if (!name) setNameError('Please type name')
+      if (!number) setNumberError('Please type number')
       return
     }
 
-    if (!validName.test(this.state.name)) {
-      this.setState({ nameError: 'only letters, apostrophe, dash and spaces' })
+    if (!validName.test(name)) {
+      setNameError('only letters, apostrophe, dash and spaces')
       return
     }
 
-    this.props.onCreate({ id: uid4(), name: this.state.name, number: this.state.number })
-    this.setState({ name: '', number: '' })
+    onCreate({ id: uid4(), name, number, })
+    setName('')
+    setNumber('')
   }
 
-  static propTypes = {
-    contacts: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.number.isRequired
-    })),
-    onCreate: PropTypes.func.isRequired,
-  }
-
-  render() {
     return (
       <div className={classes.section}>
         <div className={classes.inputWrapper}>
           <input
-            onChange={this.handleNameChange}
+            onChange={handleNameChange}
             type="text"
             name="name"
-            value={this.state.name}
+            value={name}
             pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
             title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             required
           />
-          <span>{this.state.nameError}</span>
+          <span>{nameError}</span>
         </div>
         <div className={classes.inputWrapper}>
           <input
-            onChange={this.handleNumberChange}
+            onChange={handleNumberChange}
             type="tel"
             name="number"
-            value={this.state.number}
+            value={number}
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
             required
           />
-          <span>{this.state.numberError}</span>
+          <span>{numberError}</span>
         </div>
-        <button onClick={this.handleClick}>Add contact</button>
+        <button onClick={handleClick}>Add contact</button>
       </div>
     )
-  }
 }
 
+ContactForm.propTypes = {
+  contacts: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    number: PropTypes.number.isRequired
+  })),
+  onCreate: PropTypes.func.isRequired,
+}
 
 export default ContactForm
